@@ -7,6 +7,8 @@ public class DriverManager {
     public static WebDriver getDriver(){
         return driver.get();// get value of driver in ThreadLocal
     }
+
+
     public static void setDriver(WebDriver driver){
         DriverManager.driver.set(driver);
         // assign Webdriver to ThreadLocal
