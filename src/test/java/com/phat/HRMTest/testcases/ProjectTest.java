@@ -34,7 +34,7 @@ public class ProjectTest extends BaseTest {
         basePage().clickMenuProject();
     }
 
-    @Owner("Phat Cao")
+    @Owner("Thanh Phat")
     @Epic("Project Management")
     @Feature("Add new project")
     @Severity(SeverityLevel.CRITICAL)
@@ -47,21 +47,21 @@ public class ProjectTest extends BaseTest {
         projectPage.verifyAddProjectSuccess(title, client, startDate, endDate, summary);
     }
 
-    @Owner("Phat Cao")
+    @Owner("Minh Long")
     @Epic("Project Management")
     @Feature("Edit project")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Test edit project function")
     @Test(dataProvider = "data_editProject", dataProviderClass = DataProviderFactory.class, priority = 3)
-    public void testEditProject(String title, String client, String startDate, String endDate, String summary, String updateEndDate) {
+    public void testEditProject(String title, String client, String startDate, String endDate, String summary, String update_endDate) {
         loginAsAdminAndOpenProjectMenu();
         ProjectPage projectPage = projectPage();
         projectPage.addNewProject(title, client, startDate, endDate, summary);
-        projectPage.editProject(title, updateEndDate);
-        projectPage.verifyDetailProjectAfterUpdate(updateEndDate);
+        projectPage.editProject(title, update_endDate);
+        projectPage.verifyDetailProjectAfterUpdate(update_endDate);
     }
 
-    @Owner("Phat Cao")
+    @Owner("Thanh Phat")
     @Epic("Project Management")
     @Feature("Delete project")
     @Severity(SeverityLevel.CRITICAL)
@@ -75,14 +75,14 @@ public class ProjectTest extends BaseTest {
         projectPage.verifyProjectNotDisplayedAfterDelete(title);
     }
 
-    @Owner("Phat Cao")
+    @Owner("Thanh Phat")
     @Epic("Project Management")
     @Feature("Edit status project")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Test edit status project function")
     @Test(dataProvider = "data_editStatusProject", dataProviderClass = DataProviderFactory.class, priority = 1)
     public void testEditStatusProject(String title, String client, String startDate, String endDate, String summary,
-                                      String status, String priority, String progress) {
+                                     String status, String priority, String progress) {
         loginAsAdminAndOpenProjectMenu();
         ProjectPage projectPage = projectPage();
         projectPage.addNewProject(title, client, startDate, endDate, summary);
@@ -90,18 +90,18 @@ public class ProjectTest extends BaseTest {
         projectPage.verifyStatusProjectAfterUpdate(status, priority, progress);
     }
 
-    @Owner("Phat Cao")
+    @Owner("Thanh Phat")
     @Epic("Project Management")
     @Feature("Add attach file for project")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Test add attach file function")
     @Test(dataProvider = "data_addAttachFileProject", dataProviderClass = DataProviderFactory.class)
     public void testAddAttachFileProject(String title, String client, String startDate, String endDate, String summary,
-                                         String fileName, String filePath) {
+                                         String filename, String filepath) {
         loginAsAdminAndOpenProjectMenu();
         ProjectPage projectPage = projectPage();
         projectPage.addNewProject(title, client, startDate, endDate, summary);
-        projectPage.addAttachFile(title, fileName, filePath);
-        projectPage.verifyUploadAttachSuccess(fileName);
+        projectPage.addAttachFile(title, filename, filepath);
+        projectPage.verifyUploadAttachSuccess(filename);
     }
 }

@@ -12,7 +12,9 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Listeners;
@@ -22,6 +24,51 @@ public class BaseTest {
 
     public WebDriver driver;
 
+    // Subclasses can override to use one browser per class
+    protected boolean runBrowserPerClass() { return false; }
+
+    @BeforeClass(alwaysRun = true)
+    public void openBrowserOncePerClass() {
+        if (!runBrowserPerClass()) return;
+        String browser   = PropertiesHelper.getValue("BROWSER").trim().toLowerCase();
+        boolean headless = "true".equalsIgnoreCase(PropertiesHelper.getValue("HEADLESS"));
+        Allure.step("Open " + browser + " browser (class)");
+        switch (browser) {
+            case "chrome" -> {
+                ChromeOptions opts = new ChromeOptions();
+                if (headless) { opts.addArguments("--headless=new", "--window-size=1920,1080"); }
+                opts.addArguments("--guest");
+                driver = new ChromeDriver(opts);
+            }
+            case "firefox" -> {
+                FirefoxOptions opts = new FirefoxOptions();
+                if (headless) { opts.addArguments("-headless"); }
+                driver = new FirefoxDriver(opts);
+            }
+            case "edge" -> {
+                EdgeOptions opts = new EdgeOptions();
+                if (headless) { opts.addArguments("--headless", "--window-size=1920,1080"); }
+                driver = new EdgeDriver(opts);
+            }
+            default -> {
+                ChromeOptions opts = new ChromeOptions();
+                if (headless) { opts.addArguments("--headless=new", "--window-size=1920,1080"); }
+                opts.addArguments("--guest");
+                driver = new ChromeDriver(opts);
+            }
+        }
+        DriverManager.setDriver(driver);
+        if (!headless) { DriverManager.getDriver().manage().window().maximize(); }
+    }
+
+    @AfterClass(alwaysRun = true)
+    public void closeBrowserOncePerClass() {
+        if (runBrowserPerClass()) {
+            DriverManager.quit();
+            Allure.step("Close browser (class)");
+        }
+    }
+
     @BeforeSuite
     public void runConfig() {
         PropertiesHelper.loadAllFiles();
@@ -29,6 +76,10 @@ public class BaseTest {
 
     @BeforeMethod
     public void openBrowser() {
+        if (runBrowserPerClass()) {
+            SoftAssertHelper.resetSoftAssert();
+            return;
+        }
         // ❌ KHÔNG khai báo lại WebDriver driver ở đây
         String browser   = PropertiesHelper.getValue("BROWSER").trim().toLowerCase();
         boolean headless = "true".equalsIgnoreCase(PropertiesHelper.getValue("HEADLESS"));
@@ -81,10 +132,13 @@ public class BaseTest {
 
     @AfterMethod(alwaysRun = true)
     public void tearDown() {
+        if (runBrowserPerClass()) {
+            return;
+        }
         WebDriver drv = DriverManager.getDriver();
         if (drv != null) {
-            drv.quit();
             Allure.step("Close browser");
         }
+        DriverManager.quit();
     }
 }

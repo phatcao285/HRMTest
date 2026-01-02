@@ -14,9 +14,6 @@ import org.openqa.selenium.support.pagefactory.AjaxElementLocatorFactory;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * Project management page that follows the framework PageFactory style.
- */
 public class ProjectPage extends BasePage {
 
     private final WebDriver driver;
@@ -52,7 +49,7 @@ public class ProjectPage extends BasePage {
     @FindBy(xpath = "//span[normalize-space()='Save']/parent::button")
     private WebElement buttonSave;
 
-    // ===== Date picker widgets =====
+    // ===== Date picker form =====
     @FindBy(xpath = "//div[@class='dtp animated fadeIn']//div[contains(@class,'actual-month')]")
     private WebElement currentMonth;
 
@@ -77,7 +74,7 @@ public class ProjectPage extends BasePage {
     @FindBy(xpath = "//div[@class='dtp animated fadeIn']//div[@class='dtp-buttons']/button[text()='OK']")
     private WebElement buttonOK;
 
-    // ===== Status cards =====
+    // ===== Status project =====
     @FindBy(xpath = "//span[normalize-space()='Completed']/ancestor::div/h2")
     private WebElement totalProjectsCompleted;
 
@@ -90,26 +87,21 @@ public class ProjectPage extends BasePage {
     @FindBy(xpath = "//span[normalize-space()='On Hold']/ancestor::div/h2")
     private WebElement totalProjectsOnHold;
 
-    // ===== Common controls =====
+    // ===== Common =====
     @FindBy(xpath = "//div[contains(@class,'toast-success')]")
     private WebElement alertSuccess;
 
     @FindBy(xpath = "//input[@type='search' and @aria-controls='xin_table']")
     private WebElement inputSearch;
 
-//    @FindBy(xpath = "//input[@type='search' and @aria-controls='xin_table']")
-//    private WebElement inputSearch;
+    @FindBy(xpath = "//button/parent::a[contains(@href,'project-detail')]")
+    private WebElement buttonViewDetail;
+
+    @FindBy(xpath = "//button/parent::span[@data-original-title='Delete']")
+    private WebElement buttonDeleteProject;
 
     @FindBy(xpath = "//div[@class='modal-content']//span[normalize-space()='Confirm']")
     private WebElement buttonConfirmDelete;
-
-    private By viewDetailButton(String title) {
-        return By.xpath("//table[@id='xin_table']//tr[td[normalize-space()='" + title + "']]//a[contains(@href,'project-detail')]");
-    }
-
-    private By deleteButton(String title) {
-        return By.xpath("//table[@id='xin_table']//tr[td[normalize-space()='" + title + "']]//span[@data-original-title='Delete']/button");
-    }
 
     // ===== Overview tab =====
     @FindBy(xpath = "//span[normalize-space()='Update Project']/parent::button")
@@ -130,10 +122,11 @@ public class ProjectPage extends BasePage {
     @FindBy(xpath = "//div[@id='pills-overview']//div[3]")
     private WebElement textSummary;
 
-    // ===== Tabs / Status =====
+    // ===== Edit tab =====
     @FindBy(xpath = "//a[normalize-space()='Edit']")
     private WebElement tabEdit;
 
+    // ===== Status controls =====
     @FindBy(xpath = "//span[@class='irs-single']")
     private WebElement sliderValue;
 
@@ -143,7 +136,7 @@ public class ProjectPage extends BasePage {
     @FindBy(xpath = "//span[normalize-space()='Update Status']/parent::button")
     private WebElement buttonUpdateStatus;
 
-    // ===== Attachments =====
+    // ===== Attach tab =====
     @FindBy(xpath = "//a[normalize-space()='Attach files']")
     private WebElement tabAttachFile;
 
@@ -156,19 +149,26 @@ public class ProjectPage extends BasePage {
     @FindBy(xpath = "//span[normalize-space()='Add File']/parent::button")
     private WebElement buttonAddFile;
 
-    // ===== Counters for verification =====
     private int totalProjectsCompletedBefore;
     private int totalProjectsInProgressBefore;
     private int totalProjectsNotStartedBefore;
     private int totalProjectsOnHoldBefore;
 
-    private int getTotalProjectsCompleted() { return Integer.parseInt(WebUI.getElementText(totalProjectsCompleted)); }
+    private int getTotalProjectsCompleted() {
+        return Integer.parseInt(WebUI.getElementText(totalProjectsCompleted));
+    }
 
-    private int getTotalProjectsInProgress() { return Integer.parseInt(WebUI.getElementText(totalProjectsInProgress)); }
+    private int getTotalProjectsInProgress() {
+        return Integer.parseInt(WebUI.getElementText(totalProjectsInProgress));
+    }
 
-    private int getTotalProjectsNotStarted() { return Integer.parseInt(WebUI.getElementText(totalProjectsNotStarted)); }
+    private int getTotalProjectsNotStarted() {
+        return Integer.parseInt(WebUI.getElementText(totalProjectsNotStarted));
+    }
 
-    private int getTotalProjectsOnHold() { return Integer.parseInt(WebUI.getElementText(totalProjectsOnHold)); }
+    private int getTotalProjectsOnHold() {
+        return Integer.parseInt(WebUI.getElementText(totalProjectsOnHold));
+    }
 
     private void clickAddNewProject() {
         WebUI.waitForElementVisible(buttonAddNewProject);
@@ -178,7 +178,7 @@ public class ProjectPage extends BasePage {
     private void searchTitle(String title) {
         WebUI.waitForElementVisible(inputSearch);
         WebUI.setText(inputSearch, title);
-        WebUI.sleep(1.0);
+        WebUI.sleep(1);
     }
 
     private void clickViewDetail() {
@@ -194,10 +194,10 @@ public class ProjectPage extends BasePage {
     }
 
     private void selectDate(String date) {
-        LocalDate target = DateHelper.parseDate(date);
-        String expectDay = String.format("%02d", target.getDayOfMonth());
-        String expectMonth = target.getMonth().toString().substring(0, 3).toUpperCase();
-        String expectYear = String.valueOf(target.getYear());
+        LocalDate getDate = DateHelper.parseDate(date);
+        String expectDay = String.format("%02d", getDate.getDayOfMonth());
+        String expectMonth = getDate.getMonth().toString().substring(0, 3).toUpperCase();
+        String expectYear = String.valueOf(getDate.getYear());
 
         while (true) {
             String actualMonth = currentMonth.getText();
@@ -228,7 +228,7 @@ public class ProjectPage extends BasePage {
         Allure.step("Select year: " + expectYear);
 
         for (WebElement element : currentDate) {
-            if (expectDay.equalsIgnoreCase(element.getText())) {
+            if (element.getText().equalsIgnoreCase(expectDay)) {
                 element.click();
                 break;
             }
@@ -242,7 +242,7 @@ public class ProjectPage extends BasePage {
         WebUI.setText(inputTitle, title);
         WebUI.clickElement(selectClient);
         WebUI.setText(inputSearchClient, client);
-        By optionClient = By.xpath("//li[normalize-space()='" + client + "']");
+        WebElement optionClient = driver.findElement(By.xpath("//li[normalize-space()='" + client + "']"));
         WebUI.clickElement(optionClient);
         WebUI.clickElement(inputStartDate);
         selectDate(startDate);
@@ -252,7 +252,6 @@ public class ProjectPage extends BasePage {
         WebUI.clickElement(buttonOK);
         WebUI.setText(inputSummary, summary);
         WebUI.clickElement(buttonSave);
-        WebUI.waitForElementVisible(alertSuccess);
     }
 
     public void editProject(String title, String updateEndDate) {
@@ -301,13 +300,13 @@ public class ProjectPage extends BasePage {
     }
 
     public void verifyAddProjectSuccess(String title, String client, String startDate, String endDate, String summary) {
-        int actualNotStarted = getTotalProjectsNotStarted();
+        int actualTotal = getTotalProjectsNotStarted();
         WebUI.refreshPage();
-        int expectNotStarted = actualNotStarted + 1;
-        WebUI.softVerifyEqual(getTotalProjectsNotStarted(), expectNotStarted, "Total project not started not match with expected");
+        int expectTotal = actualTotal + 1;
+        WebUI.softVerifyEqual(getTotalProjectsNotStarted(), expectTotal, "Total project notstarted not match with expected");
         searchTitle(title);
-        String actualTitle = WebUI.getElementText(By.xpath("//table[@id='xin_table']//td[1]"));
-        WebUI.softVerifyEqual(actualTitle, title, title + " Title in table not match with expected");
+        String actualTextTitle = WebUI.getElementText(By.xpath("//table[@id='xin_table']//td[1]"));
+        WebUI.softVerifyEqual(actualTextTitle, title, title + "Title in table not match with expected");
         clickViewDetail();
         WebUI.softVerifyEqual(WebUI.getElementText(textTitle), title, "Title not match with expected");
         WebUI.softVerifyEqual(WebUI.getElementText(textClient), client, "Client not match with expected");
@@ -318,7 +317,7 @@ public class ProjectPage extends BasePage {
     }
 
     public void verifyUploadAttachSuccess(String fileName) {
-        WebUI.sleep(4.0);
+        WebUI.sleep(4);
         WebUI.clickElement(tabAttachFile);
         By hyperlink = By.xpath("//h6[@class='mb-0' and normalize-space(text()[1])='" + fileName + "']/parent::a/following-sibling::div//a[contains(@href,'download')]");
         WebUI.verifyFileUpLoaded(hyperlink, "File not uploaded");
@@ -331,36 +330,36 @@ public class ProjectPage extends BasePage {
     }
 
     private void handleCompleted() {
-        int actualCompleted = getTotalProjectsCompleted();
-        int expectCompleted = totalProjectsCompletedBefore + 1;
-        WebUI.softVerifyEqual(actualCompleted, expectCompleted, "Total project completed not match with expected");
-        int actualNotStarted = getTotalProjectsNotStarted();
-        int expectNotStarted = totalProjectsNotStartedBefore - 1;
-        WebUI.softVerifyEqual(actualNotStarted, expectNotStarted, "Total project not started not match with expected");
+        int actualTotalCompleted = getTotalProjectsCompleted();
+        int expectTotalCompleted = totalProjectsCompletedBefore + 1;
+        WebUI.softVerifyEqual(actualTotalCompleted, expectTotalCompleted, "Total project completed not match with expected");
+        int actualTotalNotStarted = getTotalProjectsNotStarted();
+        int expectTotalNotStarted = totalProjectsNotStartedBefore - 1;
+        WebUI.softVerifyEqual(actualTotalNotStarted, expectTotalNotStarted, "Total project notstarted not match with expected");
     }
 
     private void handleInProgress() {
-        int actualInProgress = getTotalProjectsInProgress();
-        int expectInProgress = totalProjectsInProgressBefore + 1;
-        WebUI.softVerifyEqual(actualInProgress, expectInProgress, "Total project in progress not match with expected");
-        int actualNotStarted = getTotalProjectsNotStarted();
-        int expectNotStarted = totalProjectsNotStartedBefore - 1;
-        WebUI.softVerifyEqual(actualNotStarted, expectNotStarted, "Total project not started not match with expected");
+        int actualTotalInProgress = getTotalProjectsInProgress();
+        int expectTotalInProgress = totalProjectsInProgressBefore + 1;
+        WebUI.softVerifyEqual(actualTotalInProgress, expectTotalInProgress, "Total project inprogress not match with expected");
+        int actualTotalNotStarted = getTotalProjectsNotStarted();
+        int expectTotalNotStarted = totalProjectsNotStartedBefore - 1;
+        WebUI.softVerifyEqual(actualTotalNotStarted, expectTotalNotStarted, "Total project notstarted not match with expected");
     }
 
     private void handleOnHold() {
-        int actualOnHold = getTotalProjectsOnHold();
-        int expectOnHold = totalProjectsOnHoldBefore + 1;
-        WebUI.softVerifyEqual(actualOnHold, expectOnHold, "Total project on hold not match with expected");
-        int actualNotStarted = getTotalProjectsNotStarted();
-        int expectNotStarted = totalProjectsNotStartedBefore - 1;
-        WebUI.softVerifyEqual(actualNotStarted, expectNotStarted, "Total project not started not match with expected");
+        int actualTotalOnHold = getTotalProjectsOnHold();
+        int expectTotalOnHold = totalProjectsOnHoldBefore + 1;
+        WebUI.softVerifyEqual(actualTotalOnHold, expectTotalOnHold, "Total project onhold not match with expected");
+        int actualTotalNotStarted = getTotalProjectsNotStarted();
+        int expectTotalNotStarted = totalProjectsNotStartedBefore - 1;
+        WebUI.softVerifyEqual(actualTotalNotStarted, expectTotalNotStarted, "Total project notstarted not match with expected");
     }
 
-    private void handleCancelled() {
-        int actualNotStarted = getTotalProjectsNotStarted();
-        int expectNotStarted = totalProjectsNotStartedBefore + 1;
-        WebUI.softVerifyEqual(actualNotStarted, expectNotStarted, "Total project not started not match with expected");
+    private void handleCancled() {
+        int actualTotalNotStarted = getTotalProjectsNotStarted();
+        int expectTotalNotStarted = totalProjectsNotStartedBefore + 1;
+        WebUI.softVerifyEqual(actualTotalNotStarted, expectTotalNotStarted, "Total project notstarted not match with expected");
     }
 
     public void verifyStatusProjectAfterUpdate(String status, String priority, String progress) {
@@ -373,20 +372,30 @@ public class ProjectPage extends BasePage {
         WebUI.softVerifyEqual(actualProgress, progress, "Progress not match with expected");
         WebUI.backToPreviousPage();
         switch (status) {
-            case "Completed" -> handleCompleted();
-            case "In Progress" -> handleInProgress();
-            case "On Hold" -> handleOnHold();
-            case "Cancelled" -> handleCancelled();
-            default -> WebUI.logConsole(status + " is not exist");
+            case "Completed":
+                handleCompleted();
+                break;
+            case "In Progress":
+                handleInProgress();
+                break;
+            case "On Hold":
+                handleOnHold();
+                break;
+            case "Cancelled":
+                handleCancled();
+                break;
+            default:
+                WebUI.logConsole(status + " is not exist");
+                break;
         }
         WebUI.assertAll();
     }
 
     public void verifyProjectNotDisplayedAfterDelete(String title) {
         WebUI.refreshPage();
-        int actualNotStarted = getTotalProjectsNotStarted();
-        int expectNotStarted = totalProjectsNotStartedBefore - 1;
-        WebUI.softVerifyEqual(actualNotStarted, expectNotStarted, "Total project not started not match with expected");
+        int actualTotalNotStarted = getTotalProjectsNotStarted();
+        int expectTotalNotStarted = totalProjectsNotStartedBefore - 1;
+        WebUI.softVerifyEqual(actualTotalNotStarted, expectTotalNotStarted, "Total project notstarted not match with expected");
         searchTitle(title);
         List<WebElement> listProject = driver.findElements(By.xpath("//table//td[1][normalize-space()='" + title + "']"));
         WebUI.verifyNotDisplay(listProject, title, title + " still display in table after delete");

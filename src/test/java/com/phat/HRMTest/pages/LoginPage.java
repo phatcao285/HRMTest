@@ -41,12 +41,10 @@ public class LoginPage {
         WebUI.openURL(PropertiesHelper.getValue("URL"));
 
         WebUI.waitForElementVisible(inputUsername);
-        WebUI.clearTextWithKey(inputUsername);
-        WebUI.setText(inputUsername, username);
+        WebUI.setTextStrict(inputUsername, username);
 
         WebUI.waitForElementVisible(inputPassword);
-        WebUI.clearTextWithKey(inputPassword);
-        WebUI.setText(inputPassword, password);
+        WebUI.setTextStrict(inputPassword, password);
 
         WebUI.waitForElementClickable(buttonLogin);
         WebUI.clickElement(buttonLogin);

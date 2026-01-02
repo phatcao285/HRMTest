@@ -132,17 +132,17 @@ public class ClientPage extends BasePage {
 
         clickAddNewClient();
 
-        WebUI.setText(inputFirstName, firstName);
-        WebUI.setText(inputLastName, lastName);
-        WebUI.setText(inputPassword, password);
-        WebUI.setText(inputContactNumber, contactNumber);
+        WebUI.setTextStrict(inputFirstName, firstName);
+        WebUI.setTextStrict(inputLastName, lastName);
+        WebUI.setTextStrict(inputPassword, password);
+        WebUI.setTextStrict(inputContactNumber, contactNumber);
 
         WebUI.clickElement(selectGender);
         WebUI.waitForElementVisible(genderOption(gender));
         WebUI.clickElement(genderOption(gender));
 
-        WebUI.setText(inputEmail, email);
-        WebUI.setText(inputUsername, username);
+        WebUI.setTextStrict(inputEmail, email);
+        WebUI.setTextStrict(inputUsername, username);
 
         WebUI.uploadFile(uploadAttachment, SystemHelper.getCurrentDir() + filepath);
 

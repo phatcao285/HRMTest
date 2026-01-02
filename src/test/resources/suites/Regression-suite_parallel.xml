@@ -1,6 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="HRMSuite" verbose="1" >
-    <test name="Feature - Manage Client" parallel="methods" thread-count="3">
+    <test name="Feature - Manage Client">
         <classes>
             <class name="com.phat.HRMTest.testcases.ClientTest"/>
         </classes>
@@ -10,15 +10,15 @@
             <class name="com.phat.HRMTest.testcases.LoginTest"/>
         </classes>
     </test>
-<!--    <test name="Feature - Manage Project">-->
-<!--        <classes>-->
-<!--            <class name="com.phat.HRMTest.testcases.ProjectTest">-->
-<!--            </class>-->
-<!--        </classes>-->
-<!--    </test>-->
-<!--    <test name="Feature - Manage Task">-->
-<!--        <classes>-->
-<!--            <class name="com.phat.HRMTest.testcases.TaskTest"></class>-->
-<!--        </classes>-->
-<!--    </test>-->
+    <test name="Feature - Manage Project">
+        <classes>
+            <class name="com.phat.HRMTest.testcases.ProjectTest">
+            </class>
+        </classes>
+    </test>
+    <test name="Feature - Manage Task">
+        <classes>
+            <class name="com.phat.HRMTest.testcases.TaskTest"></class>
+        </classes>
+    </test>
 </suite>

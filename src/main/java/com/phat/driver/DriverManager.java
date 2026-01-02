@@ -14,8 +14,15 @@ public class DriverManager {
         // assign Webdriver to ThreadLocal
     }
     public static void quit(){
-        DriverManager.driver.get().quit();// Close current driver session
-        driver.remove();// Remove Thread
+        // Close current driver session safely per thread and remove reference
+        WebDriver d = driver.get();
+        try {
+            if (d != null) {
+                d.quit();
+            }
+        } finally {
+            driver.remove();
+        }
     }
 
 }

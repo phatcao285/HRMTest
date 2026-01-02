@@ -406,6 +406,37 @@ public class WebUI {
         return value;
     }
 
+    @Step("Set text strictly (WebElement)")
+    public static void setTextStrict(WebElement element, String value) {
+        waitForElementVisible(element);
+        sleep(STEP_TIME);
+        try { element.click(); } catch (Exception ignored) {}
+        try { element.clear(); } catch (Exception ignored) {}
+        try {
+            element.sendKeys(Keys.chord(Keys.CONTROL, "a"));
+            element.sendKeys(Keys.DELETE);
+        } catch (Exception ignored) {}
+        try {
+            new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(3))
+                .until(d -> {
+                    try { return "".equals(element.getAttribute("value")); }
+                    catch (StaleElementReferenceException ex) { return false; }
+                });
+        } catch (Throwable t) {
+            try { ((JavascriptExecutor) DriverManager.getDriver()).executeScript("arguments[0].value='';", element); }
+            catch (Exception ignored) {}
+        }
+        element.sendKeys(value);
+        try {
+            new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(2))
+                .until(d -> value.equals(element.getAttribute("value")));
+        } catch (Throwable t) {
+            try { ((JavascriptExecutor) DriverManager.getDriver()).executeScript("arguments[0].value=arguments[1];", element, value); }
+            catch (Exception ignored) {}
+        }
+        logConsole("Set text strictly");
+    }
+
     // ================== HOVER ==================
     public static void hoverMouse(List<WebElement> elements, int index) {
         try {
